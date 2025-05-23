@@ -1,9 +1,10 @@
-from flask import Flask, jsonify, send_from_directory, request
+from flask import Flask, jsonify, send_from_directory, request, send_file
 import sqlite3
 import subprocess
 import signal
 import os
-
+import csv
+import io
 app = Flask(__name__)
 
 # Serve HTML
@@ -119,6 +120,37 @@ def mqtt_control():
             return jsonify({'message': 'No script to terminate'})
     else:
         return jsonify({'message': 'Invalid command'}), 400
+
+@app.route('/download_csv')
+def download_csv():
+    # Koneksi ke SQLite
+    conn = sqlite3.connect('punch_data.db')
+    cursor = conn.cursor()
+
+    # Ambil semua data dari punch_log
+    cursor.execute("SELECT id, timestamp, device_id, punch_type FROM punch_log")
+    rows = cursor.fetchall()
+
+    # Buat CSV dalam memory (pakai StringIO supaya tidak perlu simpan file)
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Tulis header
+    writer.writerow(['id', 'timestamp', 'device_id', 'punch_type'])
+    
+    # Tulis data
+    writer.writerows(rows)
+
+    # Kembali ke awal
+    output.seek(0)
+
+    # Kirim file ke user
+    return send_file(
+        io.BytesIO(output.getvalue().encode()),
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name='Riwayat_Aktivitas_Latihan.csv'
+    )
 
 if __name__ == '__main__':
     # Supaya mqtt_process tidak double start saat Flask reload otomatis

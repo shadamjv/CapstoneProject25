@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,15 +9,43 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/753/753345.png" />
 </head>
-<body class="bg-gradient-to-b from-gray-100 to-white text-gray-800 p-6 relative font-sans min-h-screen">
 
+<body class="bg-gradient-to-b from-gray-100 to-white text-gray-800 p-6 relative font-sans min-h-screen">
+  <!--Tombol ON/OFF Sound-->
+  <div id="sound-controls" class="absolute top-4 left-4 space-y-4">
+    <!-- Switch Backsound -->
+    <div class="flex items-center justify-between space-x-4">
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="toggle-backsound" class="sr-only peer" checked>
+        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+      </label>
+      <span class="text-sm font-medium text-gray-700">Backsound</span>
+    </div>
+  
+    <!-- Switch Sound Effect -->
+    <div class="flex items-center justify-between space-x-4">
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="toggle-sfx" class="sr-only peer" checked>
+        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+        <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-5"></div>
+      </label>
+      <span class="text-sm font-medium text-gray-700">Sound Effect</span>
+    </div>
+  </div>
+  
+  
+  
   <!-- Tombol ON/OFF dan indikator status -->
-  <div class="absolute top-4 right-4 text-right">
-    <button id="toggleButton" class="px-6 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition duration-200 shadow-lg">
-      Mulai Latihan
-    </button>
+  <div class="absolute top-4 right-4 text-right">    
+    <button id="toggleButton"
+    class="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg hover:from-indigo-500 hover:to-blue-600 transition duration-300 transform hover:scale-105">
+    <span>Mulai Latihan</span>
+  </button>
+
     <div id="statusIndicator" class="mt-2 text-sm font-semibold text-gray-600">
-      Status: <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-1 align-middle"></span><span id="statusText">OFF</span>
+      Status: <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-1 align-middle"></span><span
+        id="statusText">OFF</span>
     </div>
   </div>
 
@@ -27,11 +56,21 @@
 
     <!-- Kotak Aktivitas -->
     <div class="mt-6 flex justify-center">
-      <div class="bg-white rounded-2xl shadow-xl px-6 py-5 text-2xl font-bold text-center w-72 border-4 border-blue-600" id="punchBox">
-        Tidak Ada Aktivitas
+      <div id="punchBox"
+        class="flex justify-center gap-4 items-center bg-white rounded-2xl shadow-xl px-6 py-5 text-2xl font-bold text-center border-4 border-blue-600 min-h-[3.5rem] w-full max-w-lg mx-auto">
+        <span class="text-gray-400 italic">Tidak Ada Aktivitas</span>
       </div>
     </div>
   </div>
+
+  <audio id="jabSound" src="static\sounds\jab.mp3"></audio>
+  <audio id="hookSound" src="static\sounds\hook.mp3"></audio>
+  <audio id="uppercutSound" src="static\sounds\uppercut.mp3"></audio>
+  <audio id="straightSound" src="static\sounds\straight.mp3"></audio>
+  <audio id="defaultSound" src="static\sounds\jab.mp3"></audio>
+  <audio id="startSound" src="static/sounds/start.mp3"></audio>
+  <audio id="stopSound" src="static/sounds/stop.mp3"></audio>
+  <audio id="backgroundMusic" src="static/sounds/background.mp3" loop></audio>
 
   <!-- Grafik Gerakan -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -54,24 +93,37 @@
     </div>
   </div>
 
-  <!-- Tabel Log Aktivitas -->
-  <div class="bg-white mt-12 p-6 rounded-2xl shadow-lg">
-    <h2 class="text-xl font-bold mb-6 text-center text-blue-700">Riwayat Aktivitas</h2>
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-left text-sm border">
-        <thead class="bg-blue-100 font-semibold text-blue-700">
-          <tr>
-            <th class="py-2 px-4 border">Waktu</th>
-            <th class="py-2 px-4 border">Perangkat</th>
-            <th class="py-2 px-4 border">Jenis Aktivitas</th>
-          </tr>
-        </thead>
-        <tbody id="punchLogTable" class="bg-white">
-          <tr><td class="px-4 py-2 italic text-gray-400" colspan="3">Belum ada data...</td></tr>
-        </tbody>
-      </table>
-    </div>
+<!-- Tabel Log Aktivitas -->
+<div class="bg-white mt-12 p-6 rounded-2xl shadow-lg relative">
+  <!-- Header dengan tombol download -->
+  <div class="relative mb-6">
+    <!-- Judul di tengah -->
+    <h2 class="text-xl font-bold text-blue-700 text-center">Riwayat Aktivitas</h2>
+    <!-- Tombol di kanan atas -->
+    <a href="/download_csv"
+       class="absolute right-0 top-0 text-sm bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+      Download CSV
+    </a>
   </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-left text-sm border">
+      <thead class="bg-blue-100 font-semibold text-blue-700">
+        <tr>
+          <th class="py-2 px-4 border">Waktu</th>
+          <th class="py-2 px-4 border">Perangkat</th>
+          <th class="py-2 px-4 border">Jenis Aktivitas</th>
+        </tr>
+      </thead>
+      <tbody id="punchLogTable" class="bg-white">
+        <tr>
+          <td class="px-4 py-2 italic text-gray-400" colspan="3">Belum ada data...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
   <!-- Footer -->
   <footer class="mt-12 text-center text-sm text-gray-500">
@@ -81,12 +133,25 @@
   <!-- Script -->
   <script>
     let isRunning = false;
+    let lastPunchTimestamp = 0;
+    const punchTimeout = 2000;
+    let punchHistory = [];
+    let lastPunchType = "";
+    let lastDeviceId = "";
+    let punchSequence = [];
+
+    const toggleBacksound = document.getElementById('toggle-backsound');
+    const toggleSFX = document.getElementById('toggle-sfx');
+
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    let isSFXEnabled = true;
+    let isBacksoundEnabled = true;
 
     const charts = {
-      leftaccel : createChart('accelLeftChart',  'red', 'green', 'blue',  -50, 50),
-      leftgyro  : createChart('gyroLeftChart',   'orange', 'purple', 'cyan', -10, 10),
-      rightaccel: createChart('accelRightChart', 'red', 'green', 'blue',  -50, 50),
-      rightgyro : createChart('gyroRightChart',  'orange', 'purple', 'cyan', -10, 10)
+      leftaccel: createChart('accelLeftChart', 'red', 'green', 'blue', -50, 50),
+      leftgyro: createChart('gyroLeftChart', 'orange', 'purple', 'cyan', -10, 10),
+      rightaccel: createChart('accelRightChart', 'red', 'green', 'blue', -50, 50),
+      rightgyro: createChart('gyroRightChart', 'orange', 'purple', 'cyan', -10, 10)
     };
 
     function createChart(canvasId, colorX, colorY, colorZ, yMin, yMax) {
@@ -153,38 +218,105 @@
       }
     }
 
+    function updatePunchDisplay() {
+      const box = document.getElementById('punchBox');
+      if (punchSequence.length === 0) {
+        box.textContent = "NO PUNCH";
+      } else {
+        const latest = punchSequence[punchSequence.length - 1];
+        box.innerHTML = `
+      <div class="text-xl">${punchSequence.slice(0, -1).join(' → ')}</div>
+      <div class="text-3xl font-bold text-blue-600">${latest}</div>
+    `;
+      }
+    }
+
     async function fetchPunchClassification() {
       try {
         const res = await fetch('/last_punch');
         const punchArray = await res.json();
+
         if (punchArray.length > 0) {
-          // Cari data dengan timestamp terbaru
           const punchData = punchArray.reduce((latest, current) =>
-          new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest);
-          document.getElementById('punchBox').textContent = punchData.punch_type;
+            new Date(current.timestamp) > new Date(latest.timestamp) ? current : latest
+          );
 
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td class="py-1 px-4 border">${punchData.timestamp}</td>
-            <td class="py-1 px-4 border">${punchData.device_id}</td>
-            <td class="py-1 px-4 border font-bold text-blue-600">${punchData.punch_type}</td>
-          `;
+          const newTimestamp = new Date(punchData.timestamp).getTime();
 
-          const table = document.getElementById('punchLogTable');
-          if (table.querySelector('td.italic')) table.innerHTML = '';
-          table.prepend(row);
-          if (table.rows.length > 10) table.deleteRow(-1);
+          if (
+            newTimestamp !== lastPunchTimestamp ||
+            punchData.punch_type !== lastPunchType ||
+            punchData.device_id !== lastDeviceId
+          ) {
+            lastPunchTimestamp = newTimestamp;
+            lastPunchType = punchData.punch_type;
+            lastDeviceId = punchData.device_id;
+
+            // Update sequence and trim to max 5
+            punchSequence.push(punchData.punch_type);
+            if (punchSequence.length > 10) punchSequence.shift();
+
+            updatePunchDisplay();
+            playPunchSound(punchData.punch_type);
+
+            // Update table
+            const row = document.createElement('tr');
+            row.innerHTML = `
+          <td class="py-1 px-4 border">${punchData.timestamp}</td>
+          <td class="py-1 px-4 border">${punchData.device_id}</td>
+          <td class="py-1 px-4 border font-bold text-blue-600">${punchData.punch_type}</td>
+        `;
+
+            const table = document.getElementById('punchLogTable');
+            if (table.querySelector('td.italic')) table.innerHTML = '';
+            table.prepend(row);
+            while (table.rows.length > 5) table.deleteRow(-1);
+          }
         }
       } catch (e) {
         console.error("Gagal fetch punch_type:", e);
       }
     }
 
+    function playPunchSound(punchType) {
+      if (!isSFXEnabled) return;
+
+      const soundMap = {
+        JAB: document.getElementById("jabSound"),
+        STRAIGHT: document.getElementById("straightSound"),
+        UPPERCUT: document.getElementById("uppercutSound"),
+        HOOK: document.getElementById("hookSound")
+      };
+      
+      const sound = soundMap[punchType.toUpperCase()] || document.getElementById("defaultSound");
+      
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(e => console.log("Sound effect play error:", e));
+      } else {
+        console.warn("Punch type tidak dikenal:", punchType);
+      }
+    }
+
+
     setInterval(() => {
       fetchAndUpdate('/data/left', 'left');
       fetchAndUpdate('/data/right', 'right');
-      if (isRunning) fetchPunchClassification();
+
+      if (isRunning) {
+        fetchPunchClassification();
+
+        // Check if punch is too old, then show "NO PUNCH"
+        if (Date.now() - lastPunchTimestamp > punchTimeout) {
+          punchSequence = [];
+          updatePunchDisplay();
+        }
+      }
     }, 100);
+
+    if (!isRunning) {
+      document.getElementById('punchBox').textContent = "NO PUNCH";
+    }
 
     const toggleButton = document.getElementById('toggleButton');
     const statusText = document.getElementById('statusText');
@@ -192,6 +324,13 @@
 
     toggleButton.addEventListener('click', async () => {
       const status = isRunning ? 'off' : 'on';
+
+      const sound = isRunning ? document.getElementById('stopSound') : document.getElementById('startSound');
+      sound.currentTime = 0;
+      sound.play().catch(err => console.warn("Audio play error:", err));
+
+      const backgroundMusic = document.getElementById('backgroundMusic');
+      
       try {
         await fetch('/mqtt-control', {
           method: 'POST',
@@ -203,16 +342,52 @@
       }
 
       isRunning = !isRunning;
-      toggleButton.textContent = isRunning ? 'Akhiri Latihan' : 'Mulai Latihan';
 
+      if (isRunning && isBacksoundEnabled) {
+        setTimeout(() => {
+          backgroundMusic.currentTime = 0;
+          backgroundMusic.play().catch(err => console.warn("Backsound error:", err));
+        }, 2000);  
+        backgroundMusic.volume = 0.2;  // 10% volume
+      } else {
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+      }
+
+      toggleButton.textContent = isRunning ? 'Akhiri Latihan' : 'Mulai Latihan';
+      statusText.textContent = isRunning ? 'ON' : 'OFF';
       toggleButton.classList.toggle('bg-blue-600', isRunning);
       toggleButton.classList.toggle('bg-gray-400', !isRunning);
 
       statusText.textContent = isRunning ? 'ON' : 'OFF';
-      statusDot.className = `inline-block w-2 h-2 rounded-full mr-1 align-middle ${
-        isRunning ? 'bg-green-500' : 'bg-gray-400'
-      }`;
+      statusDot.className = `inline-block w-2 h-2 rounded-full mr-1 align-middle ${isRunning ? 'bg-green-500' : 'bg-gray-400'}`;
     });
+
+    document.getElementById("toggle-backsound").addEventListener("change", (e) => {
+      isBacksoundEnabled = e.target.checked;
+      if (!isBacksoundEnabled) {
+        backgroundMusic.pause();
+      }
+    });
+
+    document.getElementById("toggle-sfx").addEventListener("change", (e) => {
+      isSFXEnabled = e.target.checked;
+    });
+    
+    // Toggle backsound
+    toggleBacksound.addEventListener('change', () => {
+    if (toggleBacksound.checked) {
+      backgroundMusic.volume = 0.2;
+      backgroundMusic.play().catch(e => console.log("Backsound play error:", e));
+    } else {
+      backgroundMusic.pause();
+    }
+  });
+  
+  // Toggle SFX
+  toggleSFX.addEventListener('change', () => {
+    isSFXEnabled = toggleSFX.checked;
+  });
   </script>
 </body>
 </html>

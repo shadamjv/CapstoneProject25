@@ -13,7 +13,7 @@ MQTT_PASSWORD = "Mango!River_42Sun"
 MQTT_TOPICS = [
     ("boxing/raw_data_right", 0),
     ("boxing/raw_data_left", 0),
-    ("boxing/punch_type", 0)  # ← tambahan untuk punch_type
+    ("boxing/punch_type", 2)  # ← tambahan untuk punch_type
 ]
 
 # Inisialisasi database
@@ -149,7 +149,8 @@ def on_message(client, userdata, msg):
             else:
                 print("❓ Device tidak dikenali:", device_side)
                 return
-            save_punch_type(device_id, punch_type)
+            if punch_type != "NO PUNCH":
+                save_punch_type(device_id, punch_type)
 
         else:
             print("❓ Topik tidak dikenali:", topic)
