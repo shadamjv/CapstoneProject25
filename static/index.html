@@ -34,15 +34,15 @@
     </div>
   </div>
   
-  
-  
   <!-- Tombol ON/OFF dan indikator status -->
   <div class="absolute top-4 right-4 text-right">    
     <button id="toggleButton"
     class="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold shadow-lg hover:from-indigo-500 hover:to-blue-600 transition duration-300 transform hover:scale-105">
     <span>Mulai Latihan</span>
-  </button>
-
+    </button>
+    
+    <!-- Debugging function 
+      <button onclick="playRandomSound()"> Tes Demo Audio </button> -->
     <div id="statusIndicator" class="mt-2 text-sm font-semibold text-gray-600">
       Status: <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-1 align-middle"></span><span
         id="statusText">OFF</span>
@@ -63,14 +63,15 @@
     </div>
   </div>
 
-  <audio id="jabSound" src="static\sounds\jab.mp3"></audio>
-  <audio id="hookSound" src="static\sounds\hook.mp3"></audio>
-  <audio id="uppercutSound" src="static\sounds\uppercut.mp3"></audio>
-  <audio id="straightSound" src="static\sounds\straight.mp3"></audio>
-  <audio id="defaultSound" src="static\sounds\jab.mp3"></audio>
+  <audio id="jabSound" src="static/sounds/jab.mp3"></audio>
+  <audio id="hookSound" src="static/sounds/hook.mp3"></audio>
+  <audio id="uppercutSound" src="static/sounds/uppercut.mp3"></audio>
+  <audio id="straightSound" src="static/sounds/straight.mp3"></audio>
+  <audio id="defaultSound" src="static/sounds/jab.mp3"></audio>
   <audio id="startSound" src="static/sounds/start.mp3"></audio>
   <audio id="stopSound" src="static/sounds/stop.mp3"></audio>
   <audio id="backgroundMusic" src="static/sounds/background.mp3" loop></audio>
+  <audio id="comboSound"></audio>
 
   <!-- Grafik Gerakan -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -100,8 +101,7 @@
     <!-- Judul di tengah -->
     <h2 class="text-xl font-bold text-blue-700 text-center">Riwayat Aktivitas</h2>
     <!-- Tombol di kanan atas -->
-    <a href="/download_csv"
-       class="absolute right-0 top-0 text-sm bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+    <a href="/download_csv" class="absolute right-0 top-0 text-sm bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
       Download CSV
     </a>
   </div>
@@ -139,6 +139,7 @@
     let lastPunchType = "";
     let lastDeviceId = "";
     let punchSequence = [];
+    let comboTimeout = null;
 
     const toggleBacksound = document.getElementById('toggle-backsound');
     const toggleSFX = document.getElementById('toggle-sfx');
@@ -198,6 +199,34 @@
       chart.update();
     }
 
+    function playRandomSound() {
+      let lastIndex = -1;
+      let randomIndex;
+
+      if (!isSFXEnabled) {
+         // Jika SFX dimatikan, jangan putar suara
+        return;
+      }
+      
+      const mp3Files = [
+        'static/sounds/ComboDeadly.mp3',
+        'static/sounds/ComboGreatStreak.mp3',
+        'static/sounds/ComboImpresive.mp3',
+        'static/sounds/ComboNiceMove.mp3',
+        'static/sounds/ComboNiceWork.mp3'
+      ];
+
+      do {
+        randomIndex = Math.floor(Math.random() * mp3Files.length);
+      } while (randomIndex === lastIndex && mp3Files.length > 1);
+
+      lastIndex = randomIndex;
+      
+      const audio = document.getElementById('comboSound');
+      audio.src = mp3Files[randomIndex];
+      audio.play();
+    }
+
     async function fetchAndUpdate(endpoint, prefix) {
       if (!isRunning) {
         ['accel', 'gyro'].forEach(type => {
@@ -225,10 +254,17 @@
       } else {
         const latest = punchSequence[punchSequence.length - 1];
         box.innerHTML = `
-      <div class="text-xl">${punchSequence.slice(0, -1).join(' → ')}</div>
-      <div class="text-3xl font-bold text-blue-600">${latest}</div>
-    `;
+          <div class="text-xl">${punchSequence.slice(0, -1).join(' → ')}</div>
+          <div class="text-3xl font-bold text-blue-600">${latest}</div>
+        `;
       }
+
+      if (comboTimeout) clearTimeout(comboTimeout);
+      comboTimeout = setTimeout(() => {
+        playRandomSound();
+        punchSequence = [];
+        updatePunchDisplay();
+      }, 2000); // waktu tunggu 2 detik setelah pukulan terakhir
     }
 
     async function fetchPunchClassification() {
@@ -297,7 +333,6 @@
         console.warn("Punch type tidak dikenal:", punchType);
       }
     }
-
 
     setInterval(() => {
       fetchAndUpdate('/data/left', 'left');
