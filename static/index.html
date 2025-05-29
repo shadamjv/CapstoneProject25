@@ -4,13 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Punch Classification</title>
+  <title>BoxingHands</title>
+  <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/753/753345.png" />
+  <link rel="icon" href="/static/icon/boxing-gloves.png">
 </head>
 
 <body class="bg-gradient-to-b from-gray-100 to-white text-gray-800 p-6 relative font-sans min-h-screen">
+  
   <!--Tombol ON/OFF Sound-->
   <div id="sound-controls" class="absolute top-4 left-4 space-y-4">
     <!-- Switch Backsound -->
@@ -32,7 +34,23 @@
       </label>
       <span class="text-sm font-medium text-gray-700">Sound Effect</span>
     </div>
+
+  <!-- Switch Grafik / Visual 3D -->
+  <div class="flex items-center justify-between space-x-4">
+    <label class="relative inline-flex items-center cursor-pointer">
+      <input type="checkbox" id="graphToggle" class="sr-only peer" />
+      <div
+        class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 transition-all"
+      ></div>
+      <div
+        class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"
+      ></div>
+    </label>
+    <span id="graphToggleLabel" class="text-sm font-medium text-gray-700"
+      >Visual 3D</span
+    >
   </div>
+</div>
   
   <!-- Tombol ON/OFF dan indikator status -->
   <div class="absolute top-4 right-4 text-right">    
@@ -51,7 +69,7 @@
 
   <!-- Judul dan Subjudul -->
   <div class="text-center mb-6">
-    <h1 class="text-4xl font-extrabold text-blue-700">Punch Classification</h1>
+    <h1 class="text-4xl font-extrabold text-blue-700">BoxingHands</h1>
     <p class="text-lg text-gray-600 mt-1">Capstone Project K2A - Team 2</p>
 
     <!-- Kotak Aktivitas -->
@@ -73,26 +91,42 @@
   <audio id="backgroundMusic" src="static/sounds/background.mp3" loop></audio>
   <audio id="comboSound"></audio>
 
-  <!-- Grafik Gerakan -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    <!-- Alat Kiri -->
-    <div class="bg-white shadow-lg rounded-2xl p-6">
-      <h2 class="text-xl font-bold mb-4 text-center text-blue-600">Left Arm</h2>
-      <h2 class="text-base font-semibold  mb-4 text-center text-blue-600">Accelerometer</h2>
-      <canvas id="accelLeftChart"></canvas>
-      <h2 class="text-base font-semibold mt-6 mb-4 text-center text-blue-600">Gyroscope</h2>
-      <canvas id="gyroLeftChart"></canvas>
-    </div>
-
-    <!-- Alat Kanan -->
-    <div class="bg-white shadow-lg rounded-2xl p-6">
-      <h2 class="text-xl font-bold mb-4 text-center text-blue-600">Right Arm</h2>
-      <h2 class="text-base font-semibold  mb-4 text-center text-blue-600">Accelerometer</h2>
-      <canvas id="accelRightChart"></canvas>
-      <h2 class="text-base font-semibold mt-6 mb-4 text-center text-blue-600">Gyroscope</h2>
-      <canvas id="gyroRightChart"></canvas>
+  <div class="w-full max-w-6xl mx-auto transition-all">
+    <!-- Chart View -->
+    <div id="chart-tab" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+      
+      <div class="bg-white bg-opacity-10 backdrop-blur-md border border-gray-300 rounded-xl p-2 shadow-md">
+        <h2 class="text-xl font-bold text-center text-blue-700 mb-1">Left Arm</h2>
+        <h3 class="text-xs text-center mb-1">Accelerometer</h3>
+        <canvas id="accelLeftChart" class="h-[100px] w-full"></canvas>
+        <h3 class="text-xs text-center mt-1 mb-1">Gyroscope</h3>
+        <canvas id="gyroLeftChart" class="h-[100px] w-full"></canvas>
+      </div>
+  
+      <div class="bg-white bg-opacity-10 backdrop-blur-md border border-gray-300 rounded-xl p-2 shadow-md">
+        <h2 class="text-xl font-bold text-center text-blue-700 mb-1">Right Arm</h2>
+        <h3 class="text-xs text-center mb-1">Accelerometer</h3>
+        <canvas id="accelRightChart" class="h-[100px] w-full"></canvas>
+        <h3 class="text-xs text-center mt-1 mb-1">Gyroscope</h3>
+        <canvas id="gyroRightChart" class="h-[100px] w-full"></canvas>
+      </div>
     </div>
   </div>
+
+  <!-- 3D View -->
+  <div id="visual-tab" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+    <div class="bg-white bg-opacity-10 backdrop-blur-md border border-gray-300 rounded-xl p-6 shadow-xl">
+      <h2 class="text-xl font-bold text-center text-blue-700 mb-1.5"> Left Arm</h2>
+      <div id="leftAccel3D" class="h-[300px] w-full"></div>
+    </div>
+    <div
+      class="bg-white bg-opacity-10 backdrop-blur-md border border-gray-300 rounded-xl p-6 shadow-xl"
+    >
+      <h2 class="text-xl font-bold text-center text-blue-700 mb-1.5">Right Arm</h2>
+      <div id="rightAccel3D" class="h-[300px] w-full"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Tabel Log Aktivitas -->
 <div class="bg-white mt-12 p-6 rounded-2xl shadow-lg relative">
@@ -127,7 +161,7 @@
 
   <!-- Footer -->
   <footer class="mt-12 text-center text-sm text-gray-500">
-    &copy; 2025 Capstone K2A - Team 2. All rights reserved.
+    &copy; 2025 Capstone K2A - Team 2.
   </footer>
 
   <!-- Script -->
@@ -147,6 +181,35 @@
     const backgroundMusic = document.getElementById('backgroundMusic');
     let isSFXEnabled = true;
     let isBacksoundEnabled = true;
+
+    const accel3DHistory = {
+        left: { x: [], y: [], z: [] },
+        right: { x: [], y: [], z: [] },
+      };
+
+    // Auto toggle label & tab
+    document.getElementById("graphToggle").addEventListener("change", function () {
+      const isChecked = this.checked;
+      const label = document.getElementById("graphToggleLabel");
+      const chartTab = document.getElementById("chart-tab");
+      const visualTab = document.getElementById("visual-tab");
+
+      if (isChecked) {
+        label.textContent = "Visual 3D";
+        chartTab.classList.add("hidden");
+        visualTab.classList.remove("hidden");
+
+        if (!window.visualTabInitialized) {
+          initialize3DPlot("leftAccel3D");
+          initialize3DPlot("rightAccel3D");
+          window.visualTabInitialized = true;
+        }
+      } else {
+        label.textContent = "Visual 3D";
+        chartTab.classList.remove("hidden");
+        visualTab.classList.add("hidden");
+      }
+    });
 
     const charts = {
       leftaccel: createChart('accelLeftChart', 'red', 'green', 'blue', -50, 50),
@@ -203,7 +266,7 @@
       let lastIndex = -1;
       let randomIndex;
 
-      if (!isSFXEnabled) {
+      if (!isSFXEnabled || !isRunning) {
          // Jika SFX dimatikan, jangan putar suara
         return;
       }
@@ -224,6 +287,7 @@
       
       const audio = document.getElementById('comboSound');
       audio.src = mp3Files[randomIndex];
+      audio.volume = //0.5; play 50%
       audio.play();
     }
 
@@ -258,13 +322,6 @@
           <div class="text-3xl font-bold text-blue-600">${latest}</div>
         `;
       }
-
-      if (comboTimeout) clearTimeout(comboTimeout);
-      comboTimeout = setTimeout(() => {
-        playRandomSound();
-        punchSequence = [];
-        updatePunchDisplay();
-      }, 2000); // waktu tunggu 2 detik setelah pukulan terakhir
     }
 
     async function fetchPunchClassification() {
@@ -288,25 +345,32 @@
             lastPunchType = punchData.punch_type;
             lastDeviceId = punchData.device_id;
 
-            // Update sequence and trim to max 5
+            // Update sequence and trim to max 10
             punchSequence.push(punchData.punch_type);
             if (punchSequence.length > 10) punchSequence.shift();
 
             updatePunchDisplay();
             playPunchSound(punchData.punch_type);
 
+            if (comboTimeout) clearTimeout(comboTimeout);
+            comboTimeout = setTimeout(() => {
+              playRandomSound();
+              punchSequence = [];
+              updatePunchDisplay();
+            }, 2000); // waktu tunggu 2 detik setelah pukulan terakhir
+
             // Update table
             const row = document.createElement('tr');
             row.innerHTML = `
-          <td class="py-1 px-4 border">${punchData.timestamp}</td>
-          <td class="py-1 px-4 border">${punchData.device_id}</td>
-          <td class="py-1 px-4 border font-bold text-blue-600">${punchData.punch_type}</td>
-        `;
+              <td class="py-1 px-4 border">${punchData.timestamp}</td>
+              <td class="py-1 px-4 border">${punchData.device_id}</td>
+              <td class="py-1 px-4 border font-bold text-blue-600">${punchData.punch_type}</td>
+            `;
 
             const table = document.getElementById('punchLogTable');
             if (table.querySelector('td.italic')) table.innerHTML = '';
             table.prepend(row);
-            while (table.rows.length > 5) table.deleteRow(-1);
+            while (table.rows.length > 10) table.deleteRow(-1);
           }
         }
       } catch (e) {
@@ -383,7 +447,7 @@
           backgroundMusic.currentTime = 0;
           backgroundMusic.play().catch(err => console.warn("Backsound error:", err));
         }, 2000);  
-        backgroundMusic.volume = 0.2;  // 10% volume
+        backgroundMusic.volume = 0.2;  // 20% volume
       } else {
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0;
@@ -423,6 +487,103 @@
   toggleSFX.addEventListener('change', () => {
     isSFXEnabled = toggleSFX.checked;
   });
+
+  // Function to initialize 3D plot
+  function initialize3DPlot(id) {
+    Plotly.newPlot(id,[{
+      type: "scatter3d",
+      mode: "lines+markers",
+      x: [0], // ← jangan kosong total
+      y: [0],
+      z: [0],
+      name: "Accel Data",
+      marker: {
+        size: 4,
+        color: id.includes("left") ? "red" : "red",
+      },
+      line: {
+        width: 4,
+        color: id.includes("left") ? "red" : "red",
+      },
+    },],{
+      margin: { l: 0, r: 0, b: 0, t: 0 },
+      scene: {
+        xaxis: { range: [-50, 50] },
+        yaxis: { range: [-50, 50] },
+        zaxis: { range: [-50, 50] },
+      },
+    });
+  }
+
+  // Fungsi untuk memperbarui plot 3D dengan data akselerometer baru
+  function updateAccel3D(side, data) {
+    const plotId = `${side}Accel3D`;
+
+    if (!data || !data.accel || data.accel.length !== 3) return;
+
+    const hist = accel3DHistory[side];
+    hist.x.push(data.accel[0]);
+    hist.y.push(data.accel[1]);
+    hist.z.push(data.accel[2]);
+
+    // Batasi ke 50 titik agar tidak menumpuk
+    if (hist.x.length > 10) {
+      hist.x.shift();
+      hist.y.shift();
+      hist.z.shift();
+    }
+
+    Plotly.update(
+      plotId,
+      {
+        x: [hist.x],
+        y: [hist.y],
+        z: [hist.z],
+      },
+      {},
+      [0]
+    );
+  }
+
+  // Fungsi untuk mengambil data accelerometer dari server
+  async function fetchAccelData() {
+    try {
+      const responseLeft = await fetch("/data/left");
+      const dataLeft = await responseLeft.json();
+      const responseRight = await fetch("/data/right");
+      const dataRight = await responseRight.json();
+
+      console.log("Data akselerometer kiri:", dataLeft);
+      console.log("Data akselerometer kanan:", dataRight);
+
+      // Update grafik 3D hanya jika latihan aktif
+      if (isRunning && dataLeft.accel && dataRight.accel) {
+        updateAccel3D("left", dataLeft);
+        updateAccel3D("right", dataRight);
+
+        // Tambahan agar grafik dan 3D sinkron
+        updateCharts(charts["leftaccel"], "accel", dataLeft);
+        updateCharts(charts["leftgyro"], "gyro", dataLeft);
+        updateCharts(charts["rightaccel"], "accel", dataRight);
+        updateCharts(charts["rightgyro"], "gyro", dataRight);
+      }
+    } catch (error) {
+      console.error("Error fetching accelerometer data:", error);
+    }
+  }
+
+  setTimeout(() => {
+    initialize3DPlot("leftAccel3D");
+    initialize3DPlot("rightAccel3D");
+
+    console.log("Inisialisasi 3D selesai.");
+    console.log("Elemennya:", {
+      kiri: document.getElementById("leftAccel3D"),
+      kanan: document.getElementById("rightAccel3D"),
+    });
+  }, 500);
+
+  setInterval(fetchAccelData, 100); 
   </script>
 </body>
 </html>
